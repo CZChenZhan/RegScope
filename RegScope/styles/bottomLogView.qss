@@ -1,0 +1,64 @@
+QPlainTextEdit {
+    background-color: #181a1f;
+    color: #d7dae0;
+    border: none;
+    padding: 10px 14px;
+    selection-background-color: #2f65ca;
+    selection-color: #ffffff;
+    font-family: "JetBrains Mono", "Consolas", "Courier New";
+    font-size: 9.5pt;
+}
+
+QPlainTextEdit[readOnly="true"] {
+    background-color: #181a1f;
+}
+
+QScrollBar:vertical {
+    background: #181a1f;
+    width: 12px;
+    margin: 0px;
+    border: none;
+}
+
+QScrollBar::handle:vertical {
+    background: #4f5666;
+    min-height: 28px;
+    border-radius: 5px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #697284;
+}
+
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical,
+QScrollBar::add-page:vertical,
+QScrollBar::sub-page:vertical {
+    background: none;
+    border: none;
+}
+
+QScrollBar:horizontal {
+    background: #181a1f;
+    height: 12px;
+    margin: 0px;
+    border: none;
+}
+
+QScrollBar::handle:horizontal {
+    background: #4f5666;
+    min-width: 28px;
+    border-radius: 5px;
+}
+
+QScrollBar::handle:horizontal:hover {
+    background: #697284;
+}
+
+QScrollBar::add-line:horizontal,
+QScrollBar::sub-line:horizontal,
+QScrollBar::add-page:horizontal,
+QScrollBar::sub-page:horizontal {
+    background: none;
+    border: none;
+}

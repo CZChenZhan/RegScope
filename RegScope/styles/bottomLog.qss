@@ -1,0 +1,21 @@
+QFrame#bottomLog {
+    background-color: #1b1c20;
+    border: 1px solid #31343b;
+    border-radius: 8px;
+    color: #cfd6e4;
+}
+
+QFrame#bottomLogHeader {
+    background-color: #23252a;
+    border: none;
+    border-bottom: 1px solid #31343b;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+QLabel#bottomLogTitle {
+    color: #f0f3f8;
+    font-family: "Segoe UI", "Microsoft YaHei UI";
+    font-size: 10.5pt;
+    font-weight: 600;
+}

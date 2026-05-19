@@ -1,0 +1,57 @@
+/* QMenuBar: 菜单栏整体背景和边框 */
+QMenuBar {
+    background-color: #3c3f41;  /* PyCharm 核心背景色 */
+    color: #bbbbbb;             /* 默认文字颜色 (浅灰) */
+    border-bottom: 1px solid #313335; /* 极细的底部边框，用于区分下方的工具栏 */
+    font-family: "Segoe UI", "Microsoft YaHei"; /* 现代无衬线字体 */
+    font-size: 9pt;
+    padding: 2px 0px;
+}
+
+/* QMenuBar::item: 菜单栏上的每一个顶级菜单项 (如：文件、编辑、帮助) */
+/* 注意：这里不是按钮样式，而是标准的菜单栏项选择器 */
+QMenuBar::item {
+    background-color: transparent; /* 默认背景透明 */
+    padding: 5px 12px;             /* 适当的间距，增加呼吸感 */
+    margin: 0px;
+}
+
+/* 选中/悬浮状态: 当鼠标移动到菜单项上时 */
+QMenuBar::item:selected {
+    background-color: #4b4d4d;     /* 选中时的浅灰色背景 */
+    color: #ffffff;                /* 选中时文字变为纯白 */
+}
+
+/* 按下状态: 当点击菜单项弹出下拉菜单时 */
+QMenuBar::item:pressed {
+    background-color: #4b4d4d;
+    color: #ffffff;
+}
+
+/* 下拉菜单主体 (QMenu) - 保持与菜单栏视觉一致 */
+QMenu {
+    background-color: #3c3f41;
+    color: #bbbbbb;
+    border: 1px solid #313335;     /* 弹窗边框颜色 */
+    padding: 4px;                  /* 菜单内部边距 */
+}
+
+/* 下拉菜单中的单个选项 */
+QMenu::item {
+    padding: 6px 30px 6px 25px;    /* 留出左侧图标位和右侧快捷键位 */
+    border: 1px solid transparent; /* 预留边框位置，防止抖动 */
+    background-color: transparent;
+}
+
+/* 下拉菜单项被选中 */
+QMenu::item:selected {
+    background-color: #2f65ca;     /* PyCharm 经典的蓝色选中色 (或者用 #4b4d4d 保持低调) */
+    color: #ffffff;
+}
+
+/* 菜单中的分割线 */
+QMenu::separator {
+    height: 1px;
+    background-color: #313335;     /* 与边框颜色一致 */
+    margin: 5px 0px;               /* 分割线上下留白 */
+}

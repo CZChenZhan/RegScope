@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/users"/>
+    <qresource prefix="/admin">
+        <file>configs/default.ini</file>
+        <file>configs/filter.ini</file>
+        <file>configs/level1.ini</file>
+        <file>configs/level2.ini</file>
+        <file>configs/level3.ini</file>
+        <file>configs/level4.ini</file>
+        <file>configs/level5.ini</file>
+    </qresource>
+</RCC>

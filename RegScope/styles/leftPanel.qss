@@ -1,0 +1,27 @@
+QFrame#leftPanel {
+    background-color: #1d1f24;
+    border: 1px solid #31343b;
+    border-radius: 8px;
+    color: #cfd6e4;
+}
+
+QFrame#leftPanelHeader {
+    background-color: #25262b;
+    border: none;
+    border-bottom: 1px solid #31343b;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+QLabel#leftPanelTitle {
+    color: #f0f3f8;
+    font-family: "Segoe UI", "Microsoft YaHei UI";
+    font-size: 10.5pt;
+    font-weight: 600;
+}
+
+QLabel#leftPanelMeta {
+    color: #8f9aae;
+    font-family: "Segoe UI", "Microsoft YaHei UI";
+    font-size: 9pt;
+}

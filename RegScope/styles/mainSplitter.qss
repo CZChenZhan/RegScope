@@ -1,0 +1,25 @@
+/* QSplitter 整体容器 */
+QSplitter {
+    background-color: transparent;
+    border: none;
+}
+
+/* 分割线把手: 加粗并改为灰蓝色 */
+QSplitter::handle {
+    background-color: #5a7b9a; /* 明显的灰蓝色 */
+}
+
+/* 针对 mainSplitter (垂直分割器) 的横线 */
+QSplitter::handle:vertical {
+    height: 6px; /* 加粗到 6 像素，肉眼极易识别 */
+}
+
+/* 悬浮反馈 */
+QSplitter::handle:hover {
+    background-color: #729fcf; /* 悬浮时变为亮蓝色 */
+}
+
+/* 交互反馈: 鼠标点击并拖动分割线时 */
+QSplitter::handle:pressed {
+    background-color: #2f65ca; /* 拖动时变为 PyCharm 标志性的蓝色 (Darcula Blue) */
+}

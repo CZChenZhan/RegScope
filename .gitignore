@@ -1,0 +1,55 @@
+# Qt generated files
+*~
+*.autosave
+*.a
+*.core
+*.moc
+*.o
+*.obj
+*.orig
+*.rej
+*.so
+*.so.*
+*_pch.h.cpp
+*_resource.rc
+*.qm
+.#*
+*.*#
+
+# CMake generated files
+build/
+build-*/
+CMakeCache.txt
+CMakeFiles/
+CMakeLists.txt.user
+cmake_install.cmake
+install_manifest.txt
+Makefile
+
+# QtCreator generated files
+*.pro.user*
+*.qbs.user*
+
+# Visual Studio generated files
+*.ib_pdb_index
+*.idb
+*.ilk
+*.pdb
+*.sln
+*.suo
+*.vcproj
+*vcproj.*.*.user
+*.ncb
+*.sdf
+*.opensdf
+*.vcxproj
+*vcxproj.*
+
+# Binaries
+*.dll
+*.exe
+
+# Git
+.git/
+.gitignore
+!/**/.gitignore

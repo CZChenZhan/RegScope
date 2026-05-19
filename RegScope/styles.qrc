@@ -1,0 +1,21 @@
+<RCC>
+    <qresource prefix="/QMenuBar">
+        <file>styles/mMenuBar.qss</file>
+    </qresource>
+    <qresource prefix="/QSplitter">
+        <file>styles/mainSplitter.qss</file>
+        <file>styles/topSplitter.qss</file>
+    </qresource>
+    <qresource prefix="/QFrame">
+        <file>styles/leftPanel.qss</file>
+        <file>styles/rightDisplay.qss</file>
+        <file>styles/bottomLog.qss</file>
+    </qresource>
+    <qresource prefix="/QTreeWidget">
+        <file>styles/registryTree.qss</file>
+    </qresource>
+    <qresource prefix="/QPlainTextEdit">
+        <file>styles/registryDetailView.qss</file>
+        <file>styles/bottomLogView.qss</file>
+    </qresource>
+</RCC>
