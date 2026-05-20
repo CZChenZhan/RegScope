@@ -50,7 +50,7 @@
 - **实时监控模块**：由 $\text{RegistryMonitor}$ 模块实现，基于 $\text{ETW}$ 技术实现高性能监听
 
 ### 外部依赖
-- 主要依赖 $\text{Windows}$ 系统库：$\text{advapi32}$、$\text{tdh}$、$\text{wbemuuid}$、$\text{ole32}$、$\text{oleaut32}$
+- 主要依赖 $\text{Windows}$ 系统库：advapi32、tdh、wbemuuid$、ole32、oleaut32
 
 ---
 
