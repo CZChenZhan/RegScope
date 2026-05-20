@@ -53,3 +53,6 @@ Makefile
 .git/
 .gitignore
 !/**/.gitignore
+
+RegScope_v1.0_Release/
+RegScope_v1.0_Release.zip
