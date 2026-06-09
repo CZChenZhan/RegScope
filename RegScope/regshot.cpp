@@ -1624,75 +1624,41 @@ void RegShot::CreateNewResult(DWORD ActionType, LPVOID lpOld, LPVOID lpNew)
     }
 }
 // 比较注册表
-void RegShot::CompareRegKeys(LPKeyContent lpStartKey1, LPKeyContent lpStartKey2, LPCTSTR lpParentPath)
+void RegShot::CompareRegKeys(LPKeyContent lpStartKey1, LPKeyContent lpStartKey2, const std::wstring& parentPath)
 {
     // 构建第二次快照当前键的哈希表索引
     std::unordered_map<std::wstring, LPKeyContent> KeyIndex;
     for (LPKeyContent lpKC2 = lpStartKey2; lpKC2 != NULL; lpKC2 = lpKC2->lpBrotherKey)
     {
-        // 构建当前键的完整路径
-        LPTSTR lpFullKeyName;
-        // 根键
-        if(lpParentPath == NULL || _tcslen(lpParentPath) == 0)
+        std::wstring fullPath;
+        if (parentPath.empty())
         {
-            lpFullKeyName = new TCHAR[lpKC2->dwKeyNameLen + 1];
-            if(lpFullKeyName)
-            {
-                _tcscpy(lpFullKeyName, lpKC2->lpKeyName);
-            }
+            fullPath = lpKC2->lpKeyName ? lpKC2->lpKeyName : L"";
         }
-        // 子键情况，在父路径基础上添加当前键名
         else
         {
-            DWORD parentLen = _tcslen(lpParentPath);
-            lpFullKeyName = new TCHAR[parentLen + 1 + lpKC2->dwKeyNameLen + 1];
-            if(lpFullKeyName)
-            {
-                _tcscpy(lpFullKeyName, lpParentPath);
-                _tcscat(lpFullKeyName, TEXT("\\"));
-                _tcscat(lpFullKeyName, lpKC2->lpKeyName);
-            }
+            fullPath = parentPath;
+            fullPath += L"\\";
+            fullPath += (lpKC2->lpKeyName ? lpKC2->lpKeyName : L"");
         }
-        if (lpFullKeyName != NULL)
-        {
-            KeyIndex.emplace(lpFullKeyName, lpKC2);
-            delete[] lpFullKeyName;
-        }
+        KeyIndex.emplace(fullPath, lpKC2);
     }
 
-    // 比较当前键及其兄弟键，第一次快照
+    // 比较当前键及其兄弟键
     for (LPKeyContent lpKC1 = lpStartKey1; lpKC1 != NULL; lpKC1 = lpKC1->lpBrotherKey)
     {
-        // 构建当前键的完整路径
-        LPTSTR lpFullKeyName;
-        // 根键
-        if(lpParentPath == NULL || _tcslen(lpParentPath) == 0)
+        // 构建完整路径并保存为局部变量
+        std::wstring fullKeyName;
+        if (parentPath.empty())
         {
-            lpFullKeyName = new TCHAR[lpKC1->dwKeyNameLen + 1];
-            if(lpFullKeyName)
-            {
-                _tcscpy(lpFullKeyName, lpKC1->lpKeyName);
-            }
+            fullKeyName = lpKC1->lpKeyName ? lpKC1->lpKeyName : L"";
         }
-        // 子键情况，在父路径基础上添加当前键名
         else
         {
-            DWORD parentLen = _tcslen(lpParentPath);
-            lpFullKeyName = new TCHAR[parentLen + 1 + lpKC1->dwKeyNameLen + 1];
-            if(lpFullKeyName)
-            {
-                _tcscpy(lpFullKeyName, lpParentPath);
-                _tcscat(lpFullKeyName, TEXT("\\"));
-                _tcscat(lpFullKeyName, lpKC1->lpKeyName);
-            }
+            fullKeyName = parentPath;
+            fullKeyName += L"\\";
+            fullKeyName += (lpKC1->lpKeyName ? lpKC1->lpKeyName : L"");
         }
-        // 检查是否为排除项
-        if (IsInSkipList(lpFullKeyName))
-        {
-            delete[] lpFullKeyName;
-            continue;
-        }
-        std::wstring fullKeyName(lpFullKeyName);
         // 增加已比较的键数量
         CompareResult.dwCompared.cKeys++;
         // 从哈希表中寻找和当前键对应的键
@@ -1707,11 +1673,11 @@ void RegShot::CompareRegKeys(LPKeyContent lpStartKey1, LPKeyContent lpStartKey2,
             {
                 LPValueContent lpVC1;
                 LPValueContent lpVC2;
-                // 构建第二次快照当前键的值名哈希表索引
                 std::unordered_map<std::wstring, LPValueContent> ValueIndex;
+                // 构建第二次快照当前键的值名哈希表索引
                 for (lpVC2 = lpKC2->lpFirstValue; lpVC2 != NULL; lpVC2 = lpVC2->lpBrotherValue)
                 {
-                    if (lpVC2->lpValueName)
+                    if (lpVC2->lpValueName != NULL)
                     {
                         ValueIndex.emplace(lpVC2->lpValueName, lpVC2);
                     }
@@ -1720,36 +1686,46 @@ void RegShot::CompareRegKeys(LPKeyContent lpStartKey1, LPKeyContent lpStartKey2,
                         ValueIndex.emplace(L"", lpVC2);
                     }
                 }
-
                 // 遍历比较值
                 for (lpVC1 = lpKC1->lpFirstValue; lpVC1 != NULL; lpVC1 = lpVC1->lpBrotherValue)
                 {
-                    // 增加已比较的值数量
                     CompareResult.dwCompared.cValues++;
-
                     // 寻找相同名称的值
-                    std::wstring ValueName;
-                    if (lpVC1->lpValueName != NULL)
-                    {
-                        ValueName = lpVC1->lpValueName;
-                    }
+                    std::wstring ValueName = (lpVC1->lpValueName != NULL) ? lpVC1->lpValueName : L"";
                     auto ValueIt = ValueIndex.find(ValueName);
                     // 找到相同名称的值
                     if (ValueIt != ValueIndex.end())
                     {
                         lpVC2 = ValueIt->second;
+                        ValueIndex.erase(ValueIt);
                         // 类型不同视为修改
                         if (lpVC1->dwTypeCode != lpVC2->dwTypeCode)
                         {
                             lpVC2->fValueMatch = ISMODI;
+
                             CompareResult.dwModified.cValues++;
                             CreateNewResult(VALMODI, lpVC1, lpVC2);
-                            // 移除已经比较的值
-                            ValueIndex.erase(ValueIt);
                             continue;
                         }
-                        // 找到数据相同的值，比较值数据的大小，指针地址和数据名称
-                        if ((lpVC1->dwDataSize == lpVC2->dwDataSize) && ((lpVC1->lpValueData == lpVC2->lpValueData) || ((lpVC1->lpValueData != NULL) && (lpVC2->lpValueData != NULL) && (memcmp(lpVC1->lpValueData, lpVC2->lpValueData, lpVC1->dwDataSize) == 0))))
+
+                        BOOL bDataMatch = FALSE;
+                        if (lpVC1->dwDataSize == lpVC2->dwDataSize)
+                        {
+                            if (lpVC1->dwDataSize == 0)
+                            {
+                                bDataMatch = TRUE;
+                            }
+                            else if (lpVC1->lpValueData == lpVC2->lpValueData)
+                            {
+                                bDataMatch = TRUE;
+                            }
+                            else if (lpVC1->lpValueData != NULL && lpVC2->lpValueData != NULL)
+                            {
+                                bDataMatch = (0 == memcmp(lpVC1->lpValueData, lpVC2->lpValueData, lpVC1->dwDataSize));
+                            }
+                        }
+
+                        if (bDataMatch)
                         {
                             lpVC2->fValueMatch = ISMATCH;
                         }
@@ -1758,11 +1734,8 @@ void RegShot::CompareRegKeys(LPKeyContent lpStartKey1, LPKeyContent lpStartKey2,
                         {
                             lpVC2->fValueMatch = ISMODI;
                             CompareResult.dwModified.cValues++;
-                            // 创建比较结果
                             CreateNewResult(VALMODI, lpVC1, lpVC2);
                         }
-                        // 移除已经比较的值
-                        ValueIndex.erase(ValueIt);
                     }
                     // 遍历完没有找到匹配的值，则该值已经被删除
                     else
@@ -1771,7 +1744,6 @@ void RegShot::CompareRegKeys(LPKeyContent lpStartKey1, LPKeyContent lpStartKey2,
                         CreateNewResult(VALDEL, lpVC1, NULL);
                     }
                 }
-
                 // 再次遍历第二次快照值索引表，未被标记的即为新增
                 for (auto &pair : ValueIndex)
                 {
@@ -1781,13 +1753,12 @@ void RegShot::CompareRegKeys(LPKeyContent lpStartKey1, LPKeyContent lpStartKey2,
                     CreateNewResult(VALADD, NULL, lpVC2);
                 }
             }
-            
-            // 比较子键
+
+            // 递归比较子键
             if ((lpKC1->lpFirstSubKey != NULL) || (lpKC2->lpFirstSubKey != NULL))
             {
-                CompareRegKeys(lpKC1->lpFirstSubKey, lpKC2->lpFirstSubKey, lpFullKeyName);
+                CompareRegKeys(lpKC1->lpFirstSubKey, lpKC2->lpFirstSubKey, fullKeyName);
             }
-            // 移除已经比较的键
             KeyIndex.erase(it);
         }
         // 遍历完没有找到匹配的键，则该键已经被删除
@@ -1795,59 +1766,40 @@ void RegShot::CompareRegKeys(LPKeyContent lpStartKey1, LPKeyContent lpStartKey2,
         {
             CompareResult.dwDeleted.cKeys++;
             CreateNewResult(KEYDEL, lpKC1, NULL);
-
-            // 额外的块将该键包含的值全部设置为删除
+            // 将该键包含的值全部设置为删除
+            for (LPValueContent lpVC1 = lpKC1->lpFirstValue; lpVC1 != NULL; lpVC1 = lpVC1->lpBrotherValue)
             {
-                LPValueContent lpVC1;
-
-                for (lpVC1 = lpKC1->lpFirstValue; lpVC1 != NULL; lpVC1 = lpVC1->lpBrotherValue)
-                {
-                    CompareResult.dwCompared.cValues++;
-                    CompareResult.dwDeleted.cValues++;
-                    CreateNewResult(VALDEL, lpVC1, NULL);
-                }
+                CompareResult.dwCompared.cValues++;
+                CompareResult.dwDeleted.cValues++;
+                CreateNewResult(VALDEL, lpVC1, NULL);
             }
-
             // 递归标记子键
             if (lpKC1->lpFirstSubKey != NULL)
             {
-                CompareRegKeys(lpKC1->lpFirstSubKey, NULL, lpFullKeyName);
+                CompareRegKeys(lpKC1->lpFirstSubKey, NULL, fullKeyName);
             }
         }
-
-        delete[] lpFullKeyName;
     }
-
     // 遍历键的索引表中其他键，未被标记即为新增，第二次快照
     for (auto &pair : KeyIndex)
     {
         LPKeyContent lpKC2 = pair.second;
-        // 检查是否为排除项
-        if (IsInSkipList(pair.first.c_str()))
-        {
-            continue;
-        }
         // 增加项数
         CompareResult.dwCompared.cKeys++;
         CompareResult.dwAdded.cKeys++;
         CreateNewResult(KEYADD, NULL, lpKC2);
-
-        // 额外的块将当前键包含的值标记为新增
+        // 将当前键包含的值标记为新增
+        for (LPValueContent lpVC2 = lpKC2->lpFirstValue; lpVC2 != NULL; lpVC2 = lpVC2->lpBrotherValue)
         {
-            LPValueContent lpVC2;
+            CompareResult.dwCompared.cValues++;
 
-            for (lpVC2 = lpKC2->lpFirstValue; lpVC2 != NULL; lpVC2 = lpVC2->lpBrotherValue)
-            {
-                CompareResult.dwCompared.cValues++;
-                CompareResult.dwAdded.cValues++;
-                CreateNewResult(VALADD, NULL, lpVC2);
-            }
+            CompareResult.dwAdded.cValues++;
+            CreateNewResult(VALADD, NULL, lpVC2);
         }
-
         // 递归标记子键
         if (lpKC2->lpFirstSubKey != NULL)
         {
-            CompareRegKeys(NULL, lpKC2->lpFirstSubKey, pair.first.c_str());
+            CompareRegKeys(NULL, lpKC2->lpFirstSubKey, pair.first);
         }
     }
 }
@@ -1892,23 +1844,23 @@ void RegShot::CompareShots(LPRegShotContent lpShot1, LPRegShotContent lpShot2)
     // 比较根键
     if ((CompareResult.lpShot1->lpHKCR != NULL) || (CompareResult.lpShot2->lpHKCR != NULL))
     {
-        CompareRegKeys(CompareResult.lpShot1->lpHKCR, CompareResult.lpShot2->lpHKCR);
+        CompareRegKeys(CompareResult.lpShot1->lpHKCR, CompareResult.lpShot2->lpHKCR, L"");
     }
     if ((CompareResult.lpShot1->lpHKCU != NULL) || (CompareResult.lpShot2->lpHKCU != NULL))
     {
-        CompareRegKeys(CompareResult.lpShot1->lpHKCU, CompareResult.lpShot2->lpHKCU);
+        CompareRegKeys(CompareResult.lpShot1->lpHKCU, CompareResult.lpShot2->lpHKCU, L"");
     }
     if ((CompareResult.lpShot1->lpHKLM != NULL) || (CompareResult.lpShot2->lpHKLM != NULL))
     {
-        CompareRegKeys(CompareResult.lpShot1->lpHKLM, CompareResult.lpShot2->lpHKLM);
+        CompareRegKeys(CompareResult.lpShot1->lpHKLM, CompareResult.lpShot2->lpHKLM, L"");
     }
     if ((CompareResult.lpShot1->lpHKU != NULL) || (CompareResult.lpShot2->lpHKU != NULL))
     {
-        CompareRegKeys(CompareResult.lpShot1->lpHKU, CompareResult.lpShot2->lpHKU);
+        CompareRegKeys(CompareResult.lpShot1->lpHKU, CompareResult.lpShot2->lpHKU, L"");
     }
     if ((CompareResult.lpShot1->lpHKCC != NULL) || (CompareResult.lpShot2->lpHKCC != NULL))
     {
-        CompareRegKeys(CompareResult.lpShot1->lpHKCC, CompareResult.lpShot2->lpHKCC);
+        CompareRegKeys(CompareResult.lpShot1->lpHKCC, CompareResult.lpShot2->lpHKCC, L"");
     }
 
     // 更新计数
