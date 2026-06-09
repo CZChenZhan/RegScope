@@ -249,7 +249,7 @@ private:
     void LoadRegKeys(QDataStream &in, LPRegShotContent lpShot, quint64 ofsKey, LPKeyContent lpFatherKey, LPKeyContent *lpCaller);
     // 比较快照辅助函数
     void CreateNewResult(DWORD ActionType, LPVOID lpOld, LPVOID lpNew);
-    void CompareRegKeys(LPKeyContent lpStartKey1, LPKeyContent lpStartKey2, LPCTSTR lpParentPath = NULL);
+    void CompareRegKeys(LPKeyContent lpStartKey1, LPKeyContent lpStartKey2, const std::wstring& parentPath);
     void ClearRegKeyMatchFlags(LPKeyContent lpCurrentKey);
     // 释放快照辅助函数
     void FreeAllKeyContents(LPKeyContent lpCurrentKey);
